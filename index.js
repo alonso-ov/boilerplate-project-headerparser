@@ -6,6 +6,19 @@ require('dotenv').config();
 var express = require('express');
 var app = express();
 
+var livereload = require('livereload')
+var connectLiveReload = require('connect-livereload')
+
+const liveReloadServer = livereload.createServer()
+
+liveReloadServer.server.once("connection", () => {
+  setTimeout(() => {
+    liveReloadServer.refresh("/")
+  }, 100)
+})
+
+app.use(connectLiveReload())
+
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC
 var cors = require('cors');
@@ -24,7 +37,16 @@ app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+
+app.get('/api/whoami', (req, res) => {
+  res.json({
+    ipaddress: req.ip,
+    language: req.headers['accept-language'],
+    software: req.headers['user-agent']
+  })
+})
+
 // listen for requests :)
-var listener = app.listen(process.env.PORT || 3000, function () {
+var listener = app.listen(process.env.PORT || 5050, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
